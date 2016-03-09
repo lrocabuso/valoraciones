@@ -5,33 +5,35 @@
 		//dentro de funciones de JQUERY donde se utilice también el objeto $(this).
         var clase = this;
 		// almacenamos el elemento DOM sobre el que vamos a trabajar
-        var $div_valoraciones = $(elemento);
+        var $contenedor = $(elemento);
 		// Nombre de la propiedad que identifica a cada marcador y prefijo para crear nombres de atributos
-		var atributo="star";
+		var atributo='star';
 		// Filtro para seleccionar un marcador de la lista de marcadores
 		var filtro="["+atributo+"='valor']";
 		// Elemento con el que se crea cada marcador
 		var estrella_vacia='<i class="fa fa-star-o estrella"></i>';
 		// Clase que representa un marcador activado
-		var class_llena="fa-star activa";
+		var class_llena='fa-star activa';
 		// Clase que representa un marcador desactivado		
-		var class_vacia="fa-star-o";
+		var class_vacia='fa-star-o';
 		// selector del marcador
-		var selector="i.estrella";
+		var selector='i.estrella';
 		// selector del marcador activado (utilizado para contar el total de marcadores activados)
-		var selector_activo=selector+".activa";
+		var selector_activo=selector+'.activa';
 		// Nombre de las propiedades que se buscarán en el div contenedor
-		var att_tot=atributo+"_tot";
-		var att_ini=atributo+"_ini";
-		var att_max=atributo+"_max";
-		var att_eve=atributo+"_eve";
-		var att_enb=atributo+"_enb";	
-		var att_color=atributo+"_color";								
+		var att_tot=atributo+'_tot';
+		var att_ini=atributo+'_ini';
+		var att_max=atributo+'_max';
+		var att_eve=atributo+'_eve';
+		var att_enb=atributo+'_enb';	
+		var att_color=atributo+'_color';								
+		var att_size=atributo+'_size';										
 		// Valores por defecto para las propiedades de la herramienta
 		var max_stars=25;
 		var ini_stars=5;
 		var ini_max=25;
 		var ini_val=0;
+		var ini_size=0;
 		var color_stars='#FC3';
          // Incorporamos las opciones definidas por el usuario
         var cfg = $.extend({
@@ -41,9 +43,11 @@
 				star_color:color_stars,
 				star_valor:ini_val,
 				star_enable:true,
+				star_size:ini_size,
 				evento:'click',
 				callback:null				
         }, opciones || {});
+		cfg.evento=cfg.evento.toLowerCase();
 		//-------------------------------------------------------------------------------
 		var isnumber = function(valor) {
 			return (typeof(parseInt(valor))==='number');
@@ -59,23 +63,27 @@
 			if(valor.substr(0,1)!='#') color=valor.substr(0);
 			else color=valor.substr(1);
 			return (typeof(parseInt('0x'+color))==='number');
-		};				
+		};
 		// Comprueba si los valores de las propiedades son correctos
 		var valida_propiedades = function() {
+			if(cfg.evento!='click' && cfg.evento != 'hover') cfg.evento='click';
 			if(!iscolor(cfg.star_color)) cfg.star_color=color_stars;	
 			if(cfg.star_color.substr(0,1)!='#') cfg.star_color='#'+cfg.star_color;
 			if(cfg.star_tot>max_stars) cfg.star_tot=max_stars;
 			if(cfg.star_max<cfg.star_ini) cfg.star_max=ini_max;
 			if(cfg.star_ini<0 || cfg.star_ini>cfg.star_max) cfg.star_ini=ini_val;
-			if(!isboolean(cfg.star_enable)) cfg.star_enable=false;				
+			if(!isboolean(cfg.star_enable)) cfg.star_enable=false;
+			if(!isnumber(cfg.star_size)) cfg.star_size=0;			
 		};		
 		// Activa un indicador de valoración
 		var fact = function(x) {
-			$(filtro.replace('valor',x),$div_valoraciones).removeClass(class_vacia).addClass(class_llena).css('color',cfg.star_color);
+			var $marcador = $(filtro.replace('valor',x),$contenedor);
+			$marcador.removeClass(class_vacia).addClass(class_llena).css('color',cfg.star_color);
 		};
 		// Desactiva un indicador de valoración		
 		var fdes = function(x) {
-			$(filtro.replace('valor',x),$div_valoraciones).removeClass(class_llena).addClass(class_vacia).css('color','');
+			var $marcador = $(filtro.replace('valor',x),$contenedor);
+			$marcador.removeClass(class_llena).addClass(class_vacia).css('color','');
 		};
 		// Devuelve un objeto con los valores actuales de las propìedades
 		var datos = function() {
@@ -83,7 +91,7 @@
 									marcadores:cfg.star_tot, 
 									maximo:cfg.star_max, 
 									estado:cfg.star_enable,
-									selector:$div_valoraciones};
+									selector:$contenedor};
 			return datos_valoracion;
 		};
 		// Activa/Desactiva los indicadores según la estrella sobre la que actua el ratón
@@ -95,19 +103,31 @@
 		// Pinta el total de marcadores de la herramienta
 		var pinta_marcadores = function() {
 			// Limpiamos el contenedor
-			$div_valoraciones.empty();
+			$contenedor.empty();
 			// Pintamos los marcadores (estrellas)
-			for(x=0;x<cfg.star_tot;x++) $div_valoraciones.append(estrella_vacia);
+			for(x=0;x<cfg.star_tot;x++) $contenedor.append(estrella_vacia);
 			// Asigamos a cada marcador su nº de orden
-			$(selector,$div_valoraciones).each(function(index, element) {
+			$(selector,$contenedor).each(function(index, element) {
 					$ele=$(this);
 					$ele.attr(atributo,index);
-			});					
+			});
+			$(selector,$contenedor).css('cursor','pointer');
+			var tamanyo='';
+			switch(parseInt(cfg.star_size)) {
+				case 0: tamanyo='';
+				break;
+				case 1: tamanyo='fa-lg';
+				break;
+				case 2: tamanyo='fa-2x';
+				break;
+				case 3: tamanyo='fa-3x';
+				break;	
+			};
+			$(selector,$contenedor).addClass(tamanyo);
 		};
 		// Asigna los eventos de ratón a cada marcador
-		var asigna_eventos = function() {			
-			if(cfg.evento!='click' && cfg.evento != 'hover') cfg.evento='click';
-			$(selector,$div_valoraciones).each(function(index, element) {
+		var asigna_eventos = function() {
+			$(selector,$contenedor).each(function(index, element) {
 				var disable_hover=false;
 				$ele=$(this);
 				// Si es el primer marcador
@@ -165,7 +185,7 @@
 				puntos = Math.floor(cfg.star_tot*valor/cfg.star_max);
 				poner_activas(puntos-1,false);	
 			} else {
-				puntos=$(selector_activo,$div_valoraciones).length;
+				puntos=$(selector_activo,$contenedor).length;
 			}
 			cfg.star_valor=Math.floor(cfg.star_max/cfg.star_tot*puntos);
 			return cfg.star_valor;
@@ -195,24 +215,27 @@
 //	controlar los cambios de los campos para realizar las valoraciones realizando una llamada al método
 //  marcadores de la clase		
 			
-			if($div_valoraciones.attr(att_ini)) {
-				cfg.star_ini=$div_valoraciones.attr(att_ini);
+			if($contenedor.attr(att_ini)) {
+				cfg.star_ini=$contenedor.attr(att_ini);
 			} 
-			if($div_valoraciones.attr(att_max)) {
-				cfg.star_max=$div_valoraciones.attr(att_max);
+			if($contenedor.attr(att_max)) {
+				cfg.star_max=$contenedor.attr(att_max);
 			} 			
-			if($div_valoraciones.attr(att_tot)) {
-				cfg.star_tot=$div_valoraciones.attr(att_tot);
+			if($contenedor.attr(att_tot)) {
+				cfg.star_tot=$contenedor.attr(att_tot);
 			}
-			if($div_valoraciones.attr(att_eve)) {
-				cfg.evento=$div_valoraciones.attr(att_eve);
+			if($contenedor.attr(att_eve)) {
+				cfg.evento=$contenedor.attr(att_eve);
 			} 
-			if($div_valoraciones.attr(att_color)) {
-				cfg.star_color=$div_valoraciones.attr(att_color);
+			if($contenedor.attr(att_color)) {
+				cfg.star_color=$contenedor.attr(att_color);
 			} 			
-			if($div_valoraciones.attr(att_enb)) {
-				cfg.star_enable=!($div_valoraciones.attr(att_enb)==="false");
+			if($contenedor.attr(att_enb)) {
+				cfg.star_enable=!($contenedor.attr(att_enb)==="false");
 			}
+			if($contenedor.attr(att_size)) {
+				cfg.star_size=$contenedor.attr(att_size);
+			} 			
 			valida_propiedades();
 			clase.Marcadores(cfg.star_tot);
 		
