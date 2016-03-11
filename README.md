@@ -1,29 +1,30 @@
-﻿# Valoraciones #
+# Valoraciones 1.2 #
+
 ![JQUERY 1.11.3][jquery] ![FONT-AWESOME 4.5.0][font-awesome]
 
-Valoraciones es un plugin de jQuery, que nos permite puntuar o valorar de forma gráfica por medio de estrellas coloreadas los contenidos o artículos de nuestra web.
+Valoraciones es un plugin de jQuery, que nos permite puntuar o valorar de forma gráfica por medio de estrellas coloreadas, los contenidos o artículos de nuestra web.
 
 Es completamente gratuita, redistribuible y reconfigurable por cualquier usuario bajo licencia MIT.
 
-Básicamente consta de un conjunto de marcadores con forma de estrella sobre los que podemos actuar haciendo click sobre una estrella o moviendo el ratón por encima de las estrellas para calificar o puntuar.
+Básicamente consta de un conjunto de marcadores con 15 posibles formas sobre los que podemos actuar haciendo click sobre un icono o moviendo el ratón por encima de los iconos para calificar o puntuar.
 
-Para las estrellas hace uso de las famosas font-Awesome que nos proporcionan iconos vectoriales, por lo que si deseamos cambiar el marcador, sólo tendremos que elegir un nuevo icono de los cientos que nos ofrecen.
+Para los marcadores hace uso de las famosas font-Awesome que nos proporcionan iconos vectoriales.
 
 La puntuación asignada se basa en la parte proporcional de la estrella seleccionada con respecto a la cantidad de estrellas que se muestran sobre una puntuación máxima que establecemos a la hora de crear el plugin.
 
 ## Archivos necesarios ##
 
-1.  JQuery * 
+1.  JQuery *
 
-    ``<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script> `` 
+    ``<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script> ``
 
-2.  font-Awesome * 
+2.  font-Awesome *
 
-    ``<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">`` 
+    ``<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">``
 
 3.  El archivo valoraciones.min.js
 
-    ``<script src="js/valoraciones.min.js"></script>`` 
+    ``<script src="js/valoraciones.min.js"></script>``
 
 `*` Si decides almacenar los archivos en tu web los encontrarás en los directorios dist/jquery y dist/font-awesome.
 
@@ -41,11 +42,11 @@ Este ejemplo nos creará un marcador con 5 estrellas para puntuar de 0 a 25, don
 
 Para modificar las características del marcador, podemos invocar a la función pasándole un conjunto de propiedades con sus valores.
 
-En este ejemplo crearemos un marcador de 8 estrellas que puntúe de 0 a 90 y que en lugar de utilizar el evento click del ratón utilice el evento hover (deslizarse sobre las estrellas).
+En este ejemplo crearemos un marcador de 8 iconos de tipo 'pila/batería' que puntúe de 0 a 90 y que en lugar de utilizar el evento click del ratón utilice el evento hover (deslizarse sobre las estrellas).
 
 `<div id="puntos"></div>`  
 `<script>`  
-`$(function() {$('#puntos').valoraciones({star_tot:8, star_max:90, evento:'hover'});});`  
+`$(function() {$('#puntos').valoraciones({star_tot:8, star_max:90, evento:'hover', star_ico:7});});`  
 `</script>`
 
 En este caso 1 estrella marcada -> 11 puntos, 2 estrellas marcadas -> 22, 4 estrellas marcadas -> 45 puntos, ... 8 estrellas marcadas -> 90.
@@ -54,7 +55,7 @@ La configuración de la herramienta se puede realizar también asignando las pro
 
 Veamos el mismo ejemplo anterior, pero inicializando la herramienta por medio de su contenedor.
 
-`<div id="puntos" star_tot:8 star_max:90 evento:'click'></div>`  
+`<div id="puntos" star_tot:8 star_max:90 evento:'click' star_ico:7></div>`  
 `<script>`  
 `$(function() {$('#puntos').valoraciones();});`  
 `</script>`
@@ -141,6 +142,32 @@ Para asignar 0 puntos en una valoración tendremos que ejecutar un **doble click
 
 *Establece el tamaño de los marcadores (estrellas).*
 
+### star_ico ###
+
+**tipo**: *numérico*  
+**predeterminado**: 0  
+**máximo permitido**: 15
+
+*Establece el icono que se utilizará de marcador.*
+
+Podemos elegir entre 15 posibles iconos:
+
+> 0 -> **estrella**  
+> 1 -> **círculo**  
+> 2 -> **cuadrado**  
+> 3 -> **campana**  
+> 4 -> **comentario**  
+> 5 -> **sobre correos**  
+> 6 -> **bandera**  
+> 7 -> **pila/batería**  
+> 8 -> **corazón**  
+> 9 -> **carpeta**  
+> 10 -> **reloj de arena**  
+> 11 -> **avión de papel**  
+> 12 -> **mano ok**  
+> 13 -> **candado**  
+> 14 -> **orden asc/desc**  
+
 ### evento ###
 
 **tipo**: *texto*  
@@ -185,7 +212,7 @@ Para poder acceder a los métodos del control, primero tendremos que asignar a u
 
 
 ### Valor([nuevo_valor]) ###
-**nuevo_valor**: *numérico* 
+**nuevo_valor**: *numérico*
 
 *Obtiene/Establece el valor actual que se está representado en el marcador.*
 

@@ -11,15 +11,17 @@
 		// Filtro para seleccionar un marcador de la lista de marcadores
 		var filtro="["+atributo+"='valor']";
 		// Elemento con el que se crea cada marcador
-		var estrella_vacia='<i class="fa fa-star-o estrella"></i>';
+		var estrella_vacia='<i class="fa icono estrella" style="margin-left:2px"></i>';
 		// Clase que representa un marcador activado
-		var class_llena='fa-star activa';
+		var class_llena='icono activa';
 		// Clase que representa un marcador desactivado		
-		var class_vacia='fa-star-o';
+		var class_vacia='icono';
 		// selector del marcador
 		var selector='i.estrella';
 		// selector del marcador activado (utilizado para contar el total de marcadores activados)
 		var selector_activo=selector+'.activa';
+		// Array con los iconos disponibles para los marcadores
+		var iconos = [['star','star-o'],['circle','circle-o'],['square','square-o'],['bell','bell-o'],['comment','comment-o'],['envelope','envelope-o'],['flag','flag-o'],['battery-4','battery-0'],['heart','heart-o'],['folder','folder-o'],['hourglass','hourglass-o'],['send','send-o'],['thumbs-up','thumbs-o-up'],['unlock','lock'],['sort-amount-desc','sort-amount-asc']];		
 		// Nombre de las propiedades que se buscarán en el div contenedor
 		var att_tot=atributo+'_tot';
 		var att_ini=atributo+'_ini';
@@ -27,14 +29,16 @@
 		var att_eve=atributo+'_eve';
 		var att_enb=atributo+'_enb';	
 		var att_color=atributo+'_color';								
-		var att_size=atributo+'_size';										
-		// Valores por defecto para las propiedades de la herramienta
-		var max_stars=25;
-		var ini_stars=5;
-		var ini_max=25;
-		var ini_val=0;
-		var ini_size=0;
-		var color_stars='#FC3';
+		var att_size=atributo+'_size';
+		var att_ico=atributo+'_ico';											
+		// Valores por defecto para las propiedades de la herramienta (MODIFICAR SI SE DESEAN CAMBIAR LOS VALORES POR DEFECTO)
+		var max_stars=25; 	// Nº máximo de marcadores
+		var ini_stars=5;  	// Nº de marcadores inicial
+		var ini_max=25;		// Valor máximo a representar en el marcador
+		var ini_val=0;		// Valor inicial del marcador
+		var ini_size=0;		// Tamaño inicial de cada marcador
+		var color_stars='#FC3';	// Color del marcador activado
+		var ini_ico=0;		// Icono por defecto de marcador (estrella)
          // Incorporamos las opciones definidas por el usuario
         var cfg = $.extend({
 				star_tot:ini_stars,
@@ -44,10 +48,10 @@
 				star_valor:ini_val,
 				star_enable:true,
 				star_size:ini_size,
+				star_ico:ini_ico,
 				evento:'click',
 				callback:null				
         }, opciones || {});
-		cfg.evento=cfg.evento.toLowerCase();
 		//-------------------------------------------------------------------------------
 		var isnumber = function(valor) {
 			return (typeof(parseInt(valor))==='number');
@@ -66,6 +70,12 @@
 		};
 		// Comprueba si los valores de las propiedades son correctos
 		var valida_propiedades = function() {
+			cfg.evento=cfg.evento.toLowerCase();
+			cfg.star_ini=parseInt(cfg.star_ini);
+			cfg.star_max=parseInt(cfg.star_max);
+			cfg.star_tot=parseInt(cfg.star_tot);
+			cfg.star_size=parseInt(cfg.star_size);
+			cfg.star_ico=parseInt(cfg.star_ico);
 			if(cfg.evento!='click' && cfg.evento != 'hover') cfg.evento='click';
 			if(!iscolor(cfg.star_color)) cfg.star_color=color_stars;	
 			if(cfg.star_color.substr(0,1)!='#') cfg.star_color='#'+cfg.star_color;
@@ -73,7 +83,12 @@
 			if(cfg.star_max<cfg.star_ini) cfg.star_max=ini_max;
 			if(cfg.star_ini<0 || cfg.star_ini>cfg.star_max) cfg.star_ini=ini_val;
 			if(!isboolean(cfg.star_enable)) cfg.star_enable=false;
-			if(!isnumber(cfg.star_size)) cfg.star_size=0;			
+			if(!isnumber(cfg.star_size)) cfg.star_size=0;
+			if(!isnumber(cfg.star_ico) || (cfg.star_ico>iconos.length || cfg.star_ico<0)) cfg.star_ico=0;
+			// Establecemos el icono que se utilizará de marcador			
+			estrella_vacia=estrella_vacia.replace('icono','fa-'+iconos[cfg.star_ico][1]);
+			class_llena=class_llena.replace('icono','fa-'+iconos[cfg.star_ico][0]);
+			class_vacia=class_vacia.replace('icono','fa-'+iconos[cfg.star_ico][1]);				
 		};		
 		// Activa un indicador de valoración
 		var fact = function(x) {
@@ -113,7 +128,7 @@
 			});
 			$(selector,$contenedor).css('cursor','pointer');
 			var tamanyo='';
-			switch(parseInt(cfg.star_size)) {
+			switch(cfg.star_size) {
 				case 0: tamanyo='';
 				break;
 				case 1: tamanyo='fa-lg';
@@ -213,29 +228,16 @@
 //---------------------------------------------------------------------------------------------------
 //	Después de definir los métodos de trabajo, realizamos realmente el proceso de agregar los iconos y
 //	controlar los cambios de los campos para realizar las valoraciones realizando una llamada al método
-//  marcadores de la clase		
+//  Marcadores de la clase		
 			
-			if($contenedor.attr(att_ini)) {
-				cfg.star_ini=$contenedor.attr(att_ini);
-			} 
-			if($contenedor.attr(att_max)) {
-				cfg.star_max=$contenedor.attr(att_max);
-			} 			
-			if($contenedor.attr(att_tot)) {
-				cfg.star_tot=$contenedor.attr(att_tot);
-			}
-			if($contenedor.attr(att_eve)) {
-				cfg.evento=$contenedor.attr(att_eve);
-			} 
-			if($contenedor.attr(att_color)) {
-				cfg.star_color=$contenedor.attr(att_color);
-			} 			
-			if($contenedor.attr(att_enb)) {
-				cfg.star_enable=!($contenedor.attr(att_enb)==="false");
-			}
-			if($contenedor.attr(att_size)) {
-				cfg.star_size=$contenedor.attr(att_size);
-			} 			
+			if($contenedor.attr(att_ini)) {cfg.star_ini=$contenedor.attr(att_ini);} 
+			if($contenedor.attr(att_max)) {cfg.star_max=$contenedor.attr(att_max);} 			
+			if($contenedor.attr(att_tot)) {cfg.star_tot=$contenedor.attr(att_tot);}
+			if($contenedor.attr(att_eve)) {cfg.evento=$contenedor.attr(att_eve);} 
+			if($contenedor.attr(att_color)) {cfg.star_color=$contenedor.attr(att_color);} 			
+			if($contenedor.attr(att_enb)) {cfg.star_enable=!($contenedor.attr(att_enb).toLowerCase()==="false");}
+			if($contenedor.attr(att_size)) {cfg.star_size=$contenedor.attr(att_size);} 	
+			if($contenedor.attr(att_ico)) {cfg.star_ico=$contenedor.attr(att_ico);} 					
 			valida_propiedades();
 			clase.Marcadores(cfg.star_tot);
 		
